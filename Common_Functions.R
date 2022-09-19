@@ -142,7 +142,7 @@ FeatureCounts_Matrix <- function(directory="", Stranded="reverse", counts="CDS")
 ################## Filtering Step/remove probes #####################
 
 ########### Filtering Step/remove probes #############
-Gene_filtering <- function(mat, Count_filter=0){
+Gene_filtering <- function(mat, Count_filter=0, min.prop=0.25){
   not_all_na <- function(x) any(!is.na(x))
   if(!isTRUE(is.data.frame(mat))) # If not dataFrame convert it.
     mat <- as.data.frame(mat)
@@ -150,11 +150,12 @@ Gene_filtering <- function(mat, Count_filter=0){
     dplyr::select(where(not_all_na))
   mat <- subset(mat, apply(mat, 1, sum) != 0)
   #mat <- subset(mat, apply(mat, 2, sum) != 0)# not_all_na already did this
-  mat <- mat[apply(mat,1,function(x) sum(x<=0))< ncol(mat)*0.75,]##Remove genes which have over 25% zero
+  #mat <- mat[apply(mat,1,function(x) sum(x<=0))< ncol(mat)*0.75,]##Remove genes which have over 25% zero
+  mat <- mat[apply(mat,1,function(x) sum(x<=0))< ncol(mat)*(1-min.prop),]##Remove genes which have over 25% zero. We can change min.prop accordingly.
   mat <- subset(mat, apply(mat, 1, sum) >= Count_filter)
   return(mat)}
 
-#exp <- Gene_filtering(as.data.frame(STAR_Counts))
+#exp <- Gene_filtering(as.data.frame(STAR_Counts), Count_filter=5, min.prop=0.25)
 
 #####################################################################
 #####################################################################
@@ -200,14 +201,14 @@ GDC_FPKM <- function(mat, gene_lengths, method = "FPKM")
 # This RPKM, TPM, CPM is same as Python 
 rpkm <- function(counts, lengths) {
   rate <- (counts / lengths) * 1e9
-  rate / sum(counts) }
+  rate / sum(counts, na.rm = TRUE) }
 
 tpm <- function(counts, lengths) {
   rate <- (counts / lengths)*1e3
   (rate / sum(rate, na.rm = TRUE)) * 1e6}
 
 cpm <- function(counts, lengths)
-{  (counts * 1e6) /sum(counts)}
+{  (counts * 1e6) /sum(counts, na.rm = TRUE)}
 
 #####################################################################
 #####################################################################

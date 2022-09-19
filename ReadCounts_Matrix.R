@@ -418,6 +418,7 @@ mouse.cell.cycle <- read.csv("https://raw.githubusercontent.com/hbc/tinyatlas/ma
 # www.pnas.org/cgi/doi/10.1073/pnas.1818210116 #Stemness marker
 #https://satijalab.org/seurat/reference/cc.genes.updated.2019.html#source
 #Seurat::cc.genes.updated.2019
+## Cell Cycle Progression (CCP) score :: https://www.sciencedirect.com/science/article/pii/S1535610818305828?via%3Dihub 
 median(colMeans(logcounts)) ## omit genes below the median of average expression across samples Biranda et al. PNAS Stemness paper
 
 cc.S <- mouse.cell.cycle[mouse.cell.cycle$phase=="S",]
